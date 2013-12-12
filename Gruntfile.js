@@ -3,19 +3,10 @@
     // Project configuration.
     grunt.initConfig({
         pkg: grunt.file.readJSON('package.json'),
-        uglify: {
-            options: {
-                banner: '/*! <%= pkg.name %> <%= grunt.template.today("yyyy-mm-dd") %> */\n'
-            },
-            build: {
-                src: 'dist/out.js',
-                dest: 'dist/out.min.js'
-            }
-        },
         typescript: {
-            base: {
+            build: {
                 src: ['src/main/ts/**/*.ts', 'src/main/d.ts/**/*.d.ts'],
-                dest: 'dist/out.js',
+                dest: 'build/out.js',
                 options: {
                     module: 'amd', //or commonjs
                     target: 'es5', //or es3
@@ -24,15 +15,65 @@
                     declaration: true
                 }
             }
+        },
+        clean: {
+            all: ["build", "dist", "dist.zip"]
+        },
+        uglify: {
+            dist: {
+                files: {
+                    'dist/out.min.js': ['build/out.js'],
+                    // compress handlebars
+                    'dist/lib/handlebars-v1.1.2.min.js': ['lib/handlebars-v1.1.2.js']
+                }
+            }
+        },
+        copy: {
+            dist: {
+                files: [
+                    {expand: true, src: ['lib/*.min.js'], dest: 'dist/'},
+                    {expand: true, src: ['*.css'], dest: 'dist/'},
+                    {expand: true, src: ['*.html'], dest: 'dist/'}
+                ]
+            }
+        },
+        replace: {
+            dist: {
+                src: ['dist/*.html'],
+                overwrite: true,                 // overwrite matched source files
+                replacements: [{
+                    from: /build\/out/g,
+                    to: "out"
+                },{
+                    from: /.js/g,
+                    to: ".min.js"
+                }]
+            }
+        },
+        zip: {
+            dist: {
+                src: ['dist/**'],
+                dest: 'dist.zip'
+            }
         }
     });
 
+    // clean
+    grunt.loadNpmTasks('grunt-contrib-clean');
     // Load the plugin that provides the "uglify" task.
     grunt.loadNpmTasks('grunt-contrib-uglify');
     // Load the plugin that provides the "TS" task.
     grunt.loadNpmTasks('grunt-typescript');
+    // zip
+    grunt.loadNpmTasks('grunt-zip');
+    // copy
+    grunt.loadNpmTasks('grunt-contrib-copy');
+    // replace text in file
+    grunt.loadNpmTasks('grunt-text-replace');
 
     // Default task(s).
-    grunt.registerTask('default', ['typescript', 'uglify']);
+    grunt.registerTask('clean', ['clean']);
+    grunt.registerTask('dist', ['typescript', 'uglify', 'copy', 'replace', 'zip']);
+    grunt.registerTask('default', ['typescript']);
 
 };

@@ -19,16 +19,22 @@
   <ItemGroup>
     <Content Include="app.css" />
     <Content Include="default.htm" />
+    <Content Include="Gruntfile.js" />
     <Content Include="lib\handlebars-v1.1.2.js" />
     <Content Include="lib\jquery-2.0.3.js" />
+    <Content Include="pom.xml">
+      <SubType>Designer</SubType>
+    </Content>
     <Content Include="web.config" />
   </ItemGroup>
   <ItemGroup>
-    <TypeScriptCompile Include="src\main\ts.d\handlebars.d.ts" />
-    <TypeScriptCompile Include="src\main\ts.d\jquery.d.ts" />
+    <TypeScriptCompile Include="src\main\d.ts\handlebars.d.ts" />
+    <TypeScriptCompile Include="src\main\d.ts\jquery.d.ts" />
     <TypeScriptCompile Include="src\main\ts\app.ts" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="README.md" />
+    <Content Include="package.json" />
     <None Include="web.Debug.config">
       <DependentUpon>web.config</DependentUpon>
     </None>
