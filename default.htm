@@ -1,0 +1,36 @@
+﻿<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>TypeScript HTML App</title>
+    <link rel="stylesheet" href="app.css" type="text/css" />
+
+    <script id="test" type="text/x-handlebars-template">
+        <svg width="{{width}}" height="{{height}}" viewBox="0 0 {{viewBoxWidth}} {{viewBoxHeight}}">
+            <rect id="box" x="0" y="0" width="{{viewBoxWidth}}" height="{{viewBoxHeight}}">
+            </rect>
+        </svg>
+    </script>
+
+    <script id="test-anim" type="text/x-handlebars-template">
+        <animate class="test-anim"
+                 attributename="fill"
+                 from="red"
+                 to="green"
+                 dur="5s"
+                 begin="indefinite" 
+                 fill="freeze"/>
+    </script>
+
+
+    <script src="lib/jquery-2.0.3.js"></script>
+    <script src="lib/handlebars-v1.1.2.js"></script>
+    <script src="dist/out.js"></script>
+</head>
+<body>
+    <h1>TypeScript HTML App</h1>
+
+    <div id="content"></div>
+</body>
+</html>
