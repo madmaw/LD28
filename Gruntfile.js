@@ -52,6 +52,18 @@
         },
         zip: {
             dist: {
+                router: function (filepath) {
+                    // Route each file to all/{{filename}}
+                    var s = 'dist/';
+                    var index = filepath.indexOf(s);
+                    var result;
+                    if( index == 0 ) {
+                        result = filepath.substring(s.length + index);
+                    } else {
+                        result = filepath;
+                    }
+                    return result;
+                },
                 src: ['dist/**'],
                 dest: 'dist.zip'
             }
