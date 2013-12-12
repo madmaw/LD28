@@ -17,7 +17,7 @@
             }
         },
         clean: {
-            all: ["build", "dist", "dist.zip"]
+            all:["build", "dist", "dist.zip"]
         },
         uglify: {
             dist: {
@@ -72,7 +72,7 @@
     grunt.loadNpmTasks('grunt-text-replace');
 
     // Default task(s).
-    grunt.registerTask('clean', ['clean']);
+    grunt.registerTask('reset', ['clean']);
     grunt.registerTask('dist', ['typescript', 'uglify', 'copy', 'replace', 'zip']);
     grunt.registerTask('default', ['typescript']);
 
