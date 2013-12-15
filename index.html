@@ -3,24 +3,89 @@
 <html lang="en">
 <head>
     <meta charset="utf-8" />
-    <title>TypeScript HTML App</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>Code Tower</title>
     <link rel="stylesheet" href="app.css" type="text/css" />
 
-    <script id="test" type="text/x-handlebars-template">
-        <svg width="{{width}}" height="{{height}}" viewBox="0 0 {{viewBoxWidth}} {{viewBoxHeight}}">
-            <rect id="box" x="0" y="0" width="{{viewBoxWidth}}" height="{{viewBoxHeight}}">
-            </rect>
+    <script id="board" type="text/x-handlebars-template">
+        <svg width="{{windowWidth}}" height="{{windowHeight}}" viewBox="0 0 {{windowWidth}} {{windowHeight}}">
+            <defs>
+                <pattern id="SquarePattern" patternUnits="userSpaceOnUse"
+                         x="0" y="0" width="{{tileWidth}}" height="{{tileHeight}}"
+                         viewBox="0 0 {{tileWidth}} {{tileHeight}}">
+                    <rect x="{{math tileWidth '*' '0.1'}}" y="{{math tileHeight '*' '0.1'}}" width="{{math tileWidth '*' '0.8'}}" height="{{math tileHeight '*' '0.8'}}" fill="#FEE8D6" />
+                </pattern> 
+            </defs>
+            <g id="{{gameState.board.id}}" transform="translate(0, {{headerHeight}})">
+                <rect id="box" x="0" y="0" width="{{boardWidth}}" height="{{boardHeight}}" fill="#A78D84" />
+                <rect id="box" x="0" y="0" width="{{boardWidth}}" height="{{boardHeight}}" fill="url(#SquarePattern)"/>
+                <g id="{{gameState.board.id}}-tiles">
+                    <!-- tiles go in here-->
+                </g>
+            </g>
+            <g id="{{gameState.board.id}}-header">
+                <rect x="0" y="0" width="{{boardWidth}}" height="{{headerHeight}}" fill="#111111"/>
+                <text id="{{gameState.board.id}}-score" x="{{math boardWidth '*' '0.1'}}" y="{{math headerHeight '*' '0.33'}}" text-anchor="middle" alignment-baseline="central" font-size="{{math headerHeight '/' 3}}" font-weight="bold" fill="white">{{gameState.pointsSource.points}}</text>
+                <text id="{{gameState.board.id}}-score-type" x="{{math boardWidth '*' '0.1'}}" y="{{math headerHeight '*' '0.66'}}" text-anchor="middle" alignment-baseline="central" font-size="{{math headerHeight '/' 6}}" fill="white">{{gameState.pointsSource.name}}</text>
+                <text id="{{gameState.board.id}}-time" x="{{math boardWidth '*' '0.95'}}" y="{{math headerHeight '*' '0.33'}}" text-anchor="end" alignment-baseline="central" font-size="{{math headerHeight '/' 3}}" font-weight="bold" fill="white">{{gameState.secondsRemainingFormatted}}</text>
+                <text id="{{gameState.board.id}}-title" x="{{math boardWidth '*' '0.5'}}" y="{{math headerHeight '*' '0.33'}}" text-anchor="middle" alignment-baseline="central" font-size="{{math headerHeight '/' 3}}" font-weight="bold" fill="white">{{gameState.level.name}}</text>
+                <text id="{{gameState.board.id}}-desc" x="{{math boardWidth '*' '0.5'}}" y="{{math headerHeight '*' '0.66'}}" text-anchor="middle" alignment-baseline="central" font-size="{{math headerHeight '/' 6}}" fill="white">{{gameState.level.description}}</text>
+            </g>
         </svg>
     </script>
 
-    <script id="test-anim" type="text/x-handlebars-template">
-        <animate class="test-anim"
-                 attributename="fill"
-                 from="red"
-                 to="green"
-                 dur="5s"
-                 begin="indefinite" 
-                 fill="freeze"/>
+    <script id="home" type="text/x-handlebars-template">
+        <svg width="{{windowWidth}}" height="{{windowHeight}}" viewBox="0 0 {{windowWidth}} {{windowHeight}}">
+            <g transform="translate(0, {{headerHeight}})">
+                <rect x="0" y="0" width="{{windowWidth}}" height="{{windowHeight}}" fill="black" />
+                <g>
+                    {{#each gameState.levels}}
+                    <g id="{{id}}" transform="translate({{position.x}}, {{position.y}})">
+                        <rect x="0" y="0" width="{{../selectionWidth}}" height="{{../selectionHeight}}" fill="{{#if locked}}#000000{{else}}#DDDDDD{{/if}}" stroke="#DDDDDD" stroke-width="1" />
+                        <text x="{{../selectionWidthDiv2}}" y="{{math ../selectionHeight '*' '0.33'}}" text-anchor="middle" alignment-baseline="central" font-size="{{../fontSize}}" font-weight="bold" fill="{{#if locked}}#DDDDDD{{else}}black{{/if}}">{{name}}</text>
+                        <text x="{{../selectionWidthDiv2}}" y="{{math ../selectionHeight '*' '0.66'}}" text-anchor="middle" alignment-baseline="central" font-size="{{math ../fontSize '*' '0.8'}}" fill="{{#if locked}}#DDDDDD{{else}}black{{/if}}">{{#if highScore}}High Score: {{highScore}}{{/if}}</text>
+                    </g>
+                    {{/each}}
+                </g>
+            </g>
+        </svg>
+    </script>
+
+    <script id="tile" type="text/x-handlebars-template">
+        <g id="{{tile.id}}" transform="translate({{math gameState.board.tileWidth '*' tile.position.x}}, {{math gameState.board.tileHeight '*' tile.position.y}})">
+            <rect id="{{tile.id}}-bg" x="0" y="0" width="{{gameState.board.tileWidth}}" height="{{gameState.board.tileHeight}}" fill="{{tileColor}}" />
+            <text x="{{math gameState.board.tileWidth '/' 2}}" y="{{math gameState.board.tileHeight '/' 2}}" text-anchor="middle" alignment-baseline="central" font-size="{{math gameState.board.tileHeight '/' 2}}">{{tile.symbol}}</text>
+        </g>
+    </script>
+
+    <script id="animate-action-drop" type="text/x-handlebars-template">
+        <!-- TODO make duration a function of how far it has fallen -->
+        <animatetransform id="{{animationId}}"
+                          attributename="transform"
+                          attributetype="XML"
+                          type="translate"
+                          from="{{math action.column '*' gameState.board.tileWidth}},{{math action.fromRow '*' gameState.board.tileHeight}}"
+                          to="{{math action.column '*' gameState.board.tileWidth}},{{math action.toRow '*' gameState.board.tileHeight}}"
+                          dur="{{math action.dRow '*' '0.1'}}s"
+                          calcmode="spline"
+                          keysplines="0.25 0 1 1"
+                          keytimes="0;1"
+                          additive="replace"
+                          fill="freeze"
+                          begin="indefinite" />
+    </script>
+
+    <script id="animate-attribute" type="text/x-handlebars-template">
+        <!-- TODO make duration a function of how far it has fallen -->
+        <animate id="{{animationId}}"
+                 attributetype="XML"
+                 attributename="{{attributeName}}"
+                 from="{{from}}"
+                 to="{{to}}"
+                 dur="0.15s"
+                 additive="replace"
+                 fill="freeze"
+                 begin="indefinite" />
     </script>
 
 
@@ -28,9 +93,6 @@
     <script src="lib/handlebars-v1.1.2.min.js"></script>
     <script src="out.min.js"></script>
 </head>
-<body>
-    <h1>TypeScript HTML App</h1>
-
-    <div id="content"></div>
+<body id="content">
 </body>
 </html>
