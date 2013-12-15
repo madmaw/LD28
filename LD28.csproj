@@ -18,8 +18,8 @@
   </PropertyGroup>
   <ItemGroup>
     <Content Include="app.css" />
-    <Content Include="default.htm" />
     <Content Include="Gruntfile.js" />
+    <Content Include="index.html" />
     <Content Include="lib\handlebars-v1.1.2.js" />
     <Content Include="lib\jquery-2.0.3.js" />
     <Content Include="pom.xml">
@@ -31,6 +31,61 @@
     <TypeScriptCompile Include="src\main\d.ts\handlebars.d.ts" />
     <TypeScriptCompile Include="src\main\d.ts\jquery.d.ts" />
     <TypeScriptCompile Include="src\main\ts\app.ts" />
+    <TypeScriptCompile Include="src\main\ts\core\board\action\ActionCreateTile.ts" />
+    <TypeScriptCompile Include="src\main\ts\core\board\action\ActionDeselectTile.ts" />
+    <TypeScriptCompile Include="src\main\ts\core\board\action\ActionDestroyTile.ts" />
+    <TypeScriptCompile Include="src\main\ts\core\board\action\ActionDropTile.ts" />
+    <TypeScriptCompile Include="src\main\ts\core\board\action\ActionScoreAccumulated.ts" />
+    <TypeScriptCompile Include="src\main\ts\core\board\action\ActionSelectTile.ts" />
+    <TypeScriptCompile Include="src\main\ts\core\board\action\ActionSetTileSelectionState.ts" />
+    <TypeScriptCompile Include="src\main\ts\core\board\action\ActionTimeRemainingUpdated.ts" />
+    <TypeScriptCompile Include="src\main\ts\core\board\action\ActionScoreUpdated.ts" />
+    <TypeScriptCompile Include="src\main\ts\core\board\Board.ts" />
+    <TypeScriptCompile Include="src\main\ts\core\board\BoardGameState.ts" />
+    <TypeScriptCompile Include="src\main\ts\core\board\FairTileSource.ts" />
+    <TypeScriptCompile Include="src\main\ts\core\board\IPointsSource.ts" />
+    <TypeScriptCompile Include="src\main\ts\core\board\ITileSource.ts" />
+    <TypeScriptCompile Include="src\main\ts\core\board\PointSourceAccumulated.ts" />
+    <TypeScriptCompile Include="src\main\ts\core\board\PointSourceMaxBoardValue.ts" />
+    <TypeScriptCompile Include="src\main\ts\core\board\PointSourceTime.ts" />
+    <TypeScriptCompile Include="src\main\ts\core\board\PointsSourceBoardValue.ts" />
+    <TypeScriptCompile Include="src\main\ts\core\board\TileSelectionState.ts" />
+    <TypeScriptCompile Include="src\main\ts\core\board\value\AbstractValue.ts" />
+    <TypeScriptCompile Include="src\main\ts\core\board\value\ValueFunctionAbs.ts" />
+    <TypeScriptCompile Include="src\main\ts\core\board\value\ValueFunctionAccumulate.ts" />
+    <TypeScriptCompile Include="src\main\ts\core\board\value\ValueFunctionAddTime.ts" />
+    <TypeScriptCompile Include="src\main\ts\core\board\value\ValueFunctionDecrement.ts" />
+    <TypeScriptCompile Include="src\main\ts\core\board\value\ValueFunctionIncrement.ts" />
+    <TypeScriptCompile Include="src\main\ts\core\board\value\ValueFunctionMultiplication.ts" />
+    <TypeScriptCompile Include="src\main\ts\core\board\value\ValueFunctionNegate.ts" />
+    <TypeScriptCompile Include="src\main\ts\core\board\value\ValueFunctionSubtraction.ts" />
+    <TypeScriptCompile Include="src\main\ts\core\home\action\ActionLevelSelect.ts" />
+    <TypeScriptCompile Include="src\main\ts\core\home\HomeGameState.ts" />
+    <TypeScriptCompile Include="src\main\ts\core\home\Level.ts" />
+    <TypeScriptCompile Include="src\main\ts\core\IAction.ts" />
+    <TypeScriptCompile Include="src\main\ts\core\IGameState.ts" />
+    <TypeScriptCompile Include="src\main\ts\core\board\IValue.ts" />
+    <TypeScriptCompile Include="src\main\ts\core\Point.ts" />
+    <TypeScriptCompile Include="src\main\ts\core\board\Tile.ts" />
+    <TypeScriptCompile Include="src\main\ts\core\board\value\ValueFunctionAddition.ts" />
+    <TypeScriptCompile Include="src\main\ts\core\board\value\ValueNumeric.ts" />
+    <TypeScriptCompile Include="src\main\ts\core\render\board\ActionTimeRemainingUpdatedRenderer.ts" />
+    <TypeScriptCompile Include="src\main\ts\core\render\board\ActionUpdatePointsRenderer.ts" />
+    <TypeScriptCompile Include="src\main\ts\core\render\board\BoardGameStateActionSource.ts" />
+    <TypeScriptCompile Include="src\main\ts\core\render\board\BoardGameStateRenderer.ts" />
+    <TypeScriptCompile Include="src\main\ts\core\render\board\HandlebarsSVGAnimationActionSetTileSelectionStateRenderer.ts" />
+    <TypeScriptCompile Include="src\main\ts\core\render\board\HandlebarsSVGAnimationActionCreateTileRenderer.ts" />
+    <TypeScriptCompile Include="src\main\ts\core\render\board\HandlebarsSVGAnimationActionDropTileRenderer.ts" />
+    <TypeScriptCompile Include="src\main\ts\core\render\HandlebarsSVGAnimationAttributeActionRenderer.ts" />
+    <TypeScriptCompile Include="src\main\ts\core\render\HandlebarsGameStateRenderer.ts" />
+    <TypeScriptCompile Include="src\main\ts\core\render\HandlebarsSVGAnimationActionRenderer.ts" />
+    <TypeScriptCompile Include="src\main\ts\core\render\HardcodedActionRendererFactory.ts" />
+    <TypeScriptCompile Include="src\main\ts\core\render\home\HomeGameStateActionSource.ts" />
+    <TypeScriptCompile Include="src\main\ts\core\render\home\HomeGameStateRenderer.ts" />
+    <TypeScriptCompile Include="src\main\ts\core\render\IActionRenderer.ts" />
+    <TypeScriptCompile Include="src\main\ts\core\render\IActionRendererFactory.ts" />
+    <TypeScriptCompile Include="src\main\ts\core\render\IActionSource.ts" />
+    <TypeScriptCompile Include="src\main\ts\core\render\IGameStateRenderer.ts" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="README.md" />
@@ -75,7 +130,7 @@
     <TypeScriptRemoveComments>false</TypeScriptRemoveComments>
     <TypeScriptSourceMap>true</TypeScriptSourceMap>
     <TypeScriptModuleKind>AMD</TypeScriptModuleKind>
-    <TypeScriptOutFile>dist/out.js</TypeScriptOutFile>
+    <TypeScriptOutFile>build/out.js</TypeScriptOutFile>
     <TypeScriptMapRoot>dist/maps</TypeScriptMapRoot>
     <TypeScriptSourceRoot>src/main/ts</TypeScriptSourceRoot>
   </PropertyGroup>
