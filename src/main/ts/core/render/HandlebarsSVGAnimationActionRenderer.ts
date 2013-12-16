@@ -18,7 +18,7 @@ module ct.core.render {
                 this.params["animationId"] = animationId;
                 this.adjustParams(action, gameState, this.params);
                 var animationSVG = this.template(this.params);
-                var animationNodes = this.parseSVG(animationSVG);
+                var animationNodes = HandlebarsSVGAnimationActionRenderer.parseSVG(animationSVG);
                 var animationCompletionCount = 0;
                 for (var i in animationNodes) {
                     var animationNode = animationNodes[i];
@@ -65,7 +65,7 @@ module ct.core.render {
             return div;
         }
 
-        public parseSVG(s: string, targetId?: string): Element[] {
+        public static parseSVG(s: string, targetId?: string): Element[] {
             var div = <HTMLElement>document.createElementNS('http://www.w3.org/1999/xhtml', 'div');
             div.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg">' + s + '</svg>';
             // TOOD this without jQuery

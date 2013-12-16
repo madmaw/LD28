@@ -38,7 +38,7 @@ module ct.core.render.board {
             var result: Element = document.getElementById(id);
             if (!result) {
                 var tileSVG = this.tileTemplate({ tile: tile, gameState: gameState, tileColor: this.tileColor });
-                result = this.parseSVG(tileSVG, id)[0];
+                result = HandlebarsSVGAnimationActionRenderer.parseSVG(tileSVG, id)[0];
                 var boardTiles = document.getElementById(board.id + "-tiles");
 
                 var firstChild = boardTiles.firstChild;

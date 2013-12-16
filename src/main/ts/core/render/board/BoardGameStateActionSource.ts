@@ -7,6 +7,10 @@ module ct.core.render.board {
         private mouseDown = false;
         private timerId: number;
 
+        private touchStartListener: (e:any) => void;
+        private touchMoveListener: (e: any) => void;
+        private touchEndListener: (e: any) => void;
+
         constructor(
             private gameState: ct.core.board.BoardGameState,
             private homeGameState: ct.core.IGameState,
@@ -156,25 +160,32 @@ module ct.core.render.board {
             this.div.onmouseup = mouseUpHandler;
             this.div.onmousemove = mouseMoveHandler;
 
-            this.div.addEventListener('touchstart', function (e:any) {
+            this.touchStartListener = function (e: any) {
                 mouseDownHandler(e.touches[0]);
                 //window.alert("touch start " + e.touches[0]);
                 e.preventDefault();
-            }); 
-            this.div.addEventListener('touchmove', function (e: any) {
+            };
+            this.touchMoveListener = function (e: any) {
                 mouseMoveHandler(e.touches[0]);
                 e.preventDefault();
-            }); 
-            this.div.addEventListener('touchend', function (e: any) {
+            };
+            this.touchEndListener = function (e: any) {
                 mouseUpHandler();
                 e.preventDefault();
-            }); 
+            };
+
+            this.div.addEventListener('touchstart', this.touchStartListener); 
+            this.div.addEventListener('touchmove', this.touchMoveListener); 
+            this.div.addEventListener('touchend', this.touchEndListener); 
         }
 
         stop(): void {
             this.div.onmousedown = null;
             this.div.onmouseup = null;
             this.div.onmousemove = null;
+            this.div.removeEventListener("touchstart", this.touchStartListener);
+            this.div.removeEventListener("touchmove", this.touchMoveListener);
+            this.div.removeEventListener("touchend", this.touchEndListener);
             if (this.timerId != null) {
                 clearTimeout(this.timerId);
                 this.timerId = null;

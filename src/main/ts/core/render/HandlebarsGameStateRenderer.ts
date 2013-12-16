@@ -15,8 +15,15 @@ module ct.core.render {
         }
 
         public doRender(gameState: IGameState, div: HTMLElement, parameters: { [_: string]: any }) {
+            while (div.firstChild) {
+                div.removeChild(div.firstChild);
+            }
             var html = this.template(parameters);
-            div.innerHTML = html;
+            var nodes = HandlebarsSVGAnimationActionRenderer.parseSVG(html);
+            for (var i in nodes) {
+                var node = nodes[i];
+                div.appendChild(node);
+            }
         }
     }
 
