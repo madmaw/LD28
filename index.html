@@ -8,11 +8,11 @@
     <link rel="stylesheet" href="app.css" type="text/css" />
 
     <script id="board" type="text/x-handlebars-template">
-        <svg width="{{windowWidth}}" height="{{windowHeight}}" viewBox="0 0 {{windowWidth}} {{windowHeight}}">
+        <g>
             <defs>
                 <pattern id="SquarePattern" patternUnits="userSpaceOnUse"
-                         x="0" y="0" width="{{math tileWidth '*' '0.5'}}" height="{{math tileHeight '*' '0.5'}}"
-                         viewBox="0 0 {{math tileWidth '*' '0.5'}} {{math tileHeight '*' '0.5'}}">
+                            x="0" y="0" width="{{math tileWidth '*' '0.5'}}" height="{{math tileHeight '*' '0.5'}}"
+                            viewBox="0 0 {{math tileWidth '*' '0.5'}} {{math tileHeight '*' '0.5'}}">
                     <rect x="{{math tileWidth '*' '0.1'}}" y="{{math tileHeight '*' '0.1'}}" width="{{math tileWidth '*' '0.4'}}" height="{{math tileHeight '*' '0.4'}}" fill="#333345" />
                 </pattern> 
             </defs>
@@ -31,24 +31,22 @@
                 <text id="{{gameState.board.id}}-title" x="{{math boardWidth '*' '0.5'}}" y="{{math headerHeight '*' '0.33'}}" text-anchor="middle" alignment-baseline="central" font-size="{{math headerHeight '/' 3}}" font-weight="bold" fill="white">{{gameState.level.name}}</text>
                 <text id="{{gameState.board.id}}-desc" x="{{math boardWidth '*' '0.5'}}" y="{{math headerHeight '*' '0.66'}}" text-anchor="middle" alignment-baseline="central" font-size="{{math headerHeight '/' 6}}" fill="white">{{gameState.level.description}}</text>
             </g>
-        </svg>
+        </g>
     </script>
 
     <script id="home" type="text/x-handlebars-template">
-        <svg width="{{windowWidth}}" height="{{windowHeight}}" viewBox="0 0 {{windowWidth}} {{windowHeight}}">
-            <g transform="translate(0, {{headerHeight}})">
-                <rect x="0" y="0" width="{{windowWidth}}" height="{{windowHeight}}" fill="black" />
-                <g>
-                    {{#each gameState.levels}}
-                    <g id="{{id}}" transform="translate({{position.x}}, {{position.y}})">
-                        <rect x="0" y="0" width="{{../selectionWidth}}" height="{{../selectionHeight}}" fill="{{#if locked}}#000000{{else}}#DDDDDD{{/if}}" stroke="#DDDDDD" stroke-width="1" />
-                        <text x="{{../selectionWidthDiv2}}" y="{{math ../selectionHeight '*' '0.33'}}" text-anchor="middle" alignment-baseline="central" font-size="{{../fontSize}}" font-weight="bold" fill="{{#if locked}}#DDDDDD{{else}}black{{/if}}">{{name}}</text>
-                        <text x="{{../selectionWidthDiv2}}" y="{{math ../selectionHeight '*' '0.66'}}" text-anchor="middle" alignment-baseline="central" font-size="{{math ../fontSize '*' '0.8'}}" fill="{{#if locked}}#DDDDDD{{else}}black{{/if}}">{{#if highScore}}High Score: {{highScore}}{{/if}}</text>
-                    </g>
-                    {{/each}}
+        <g transform="translate(0, {{headerHeight}})">
+            <rect x="0" y="0" width="{{windowWidth}}" height="{{windowHeight}}" fill="black" />
+            <g>
+                {{#each gameState.levels}}
+                <g id="{{id}}" transform="translate({{position.x}}, {{position.y}})">
+                    <rect x="0" y="0" width="{{../selectionWidth}}" height="{{../selectionHeight}}" fill="{{#if locked}}#000000{{else}}#DDDDDD{{/if}}" stroke="#DDDDDD" stroke-width="1" />
+                    <text x="{{../selectionWidthDiv2}}" y="{{math ../selectionHeight '*' '0.33'}}" text-anchor="middle" alignment-baseline="central" font-size="{{../fontSize}}" font-weight="bold" fill="{{#if locked}}#DDDDDD{{else}}black{{/if}}">{{name}}</text>
+                    <text x="{{../selectionWidthDiv2}}" y="{{math ../selectionHeight '*' '0.66'}}" text-anchor="middle" alignment-baseline="central" font-size="{{math ../fontSize '*' '0.8'}}" fill="{{#if locked}}#DDDDDD{{else}}black{{/if}}">{{#if highScore}}High Score: {{highScore}}{{/if}}</text>
                 </g>
+                {{/each}}
             </g>
-        </svg>
+        </g>
     </script>
 
     <script id="tile" type="text/x-handlebars-template">
@@ -121,7 +119,12 @@
 
 </head>
 <body>
+    <!--
     <div id="content"></div>
+    -->
+    <svg id="content" width="100%" height="100%">
+         
+    </svg>
     <audio id="click-1">
         <source src="res/click-1.wav" type="audio/wav" preload="true"></source>
     </audio>
