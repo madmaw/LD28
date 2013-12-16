@@ -3,9 +3,11 @@ module ct.core {
     export class SoundEffect {
 
         private playCount: number;
+        private inUse: { [_: string]: boolean };
 
         constructor(private audioIds: string[]) {
             this.playCount = 0;
+            this.inUse = {};
         }
 
 
@@ -21,17 +23,22 @@ module ct.core {
         }
 
         public forcePlay(): void {
-            this.playCount++;
             if (this.audioIds.length > 0) {
                 var index = Math.floor(Math.random() * this.audioIds.length);
                 var audioId = this.audioIds[index];
-                var audio = document.getElementById(audioId);
-                if (audio != null) {
-                    var copy = <HTMLAudioElement>audio.cloneNode(true);
-                    copy.addEventListener("ended", () => {
-                        this.playCount--;
-                    });
-                    copy.play();
+                if (!this.inUse[audioId]) {
+                    this.playCount++;
+                    this.inUse[audioId] = true;
+                    var audio = document.getElementById(audioId);
+                    if (audio != null) {
+                        //var copy = <HTMLAudioElement>audio.cloneNode(true);
+                        var copy = <HTMLAudioElement>audio;
+                        copy.addEventListener("ended", () => {
+                            this.playCount--;
+                            this.inUse[audioId] = false;
+                        });
+                        copy.play();
+                    }
                 }
             }
         }

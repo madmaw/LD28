@@ -45,10 +45,16 @@ module ct {
         ];
         var invalidSoundEffect = new ct.core.SoundEffect(["invalid-1", "invalid-2"]);
 
-        var columns = 7;
+        var columns = 6;
         var tileWidth = Math.floor((window.innerWidth) / columns);
         var tileHeight = Math.floor((window.innerHeight)/Math.floor(window.innerHeight / tileWidth));
         var rows = Math.floor((window.innerHeight) / tileHeight);
+        if (rows < 5) {
+            rows = 5;
+            tileHeight = Math.floor(window.innerHeight / rows);
+            columns = Math.floor(window.innerWidth / tileHeight);
+            tileWidth = Math.floor(window.innerWidth / columns);
+        }
         var headerHeight = tileHeight;
         rows--;
 
