@@ -17,7 +17,9 @@ module ct.core.render {
             badParameterTileSelectionColor: string,
             tileTemplate: (context: any, options?: any) => string,
             attributeAnimationTemplate: (context: any, options?: any) => string,
-            dropTileAnimationTemplate: (context: any, options?: any) => string
+            tileClaimTemplate: (context: any, options?: any) => string,
+            dropTileAnimationTemplate: (context: any, options?: any) => string,
+            dropTileSoundEffect: SoundEffect
         ) {
             this.selectTileActionRenderer = new ct.core.render.board.HandlebarsSVGAnimationActionSetTileSelectionStateRenderer(
                 attributeAnimationTemplate,
@@ -29,9 +31,9 @@ module ct.core.render {
                 "-bg",
                 {}
             );
-            this.dropTileActionRenderer = new ct.core.render.board.HandlebarsSVGAnimationActionDropTileRenderer(dropTileAnimationTemplate, tileTemplate, tileColor, {});
+            this.dropTileActionRenderer = new ct.core.render.board.HandlebarsSVGAnimationActionDropTileRenderer(dropTileAnimationTemplate, tileTemplate, tileColor, dropTileSoundEffect, {});
             // TODO this should remove the element as well as just fade it out!
-            this.destroyTileActionRenderer = new ct.core.render.HandlebarsSVGAnimationAttributeActionRenderer(attributeAnimationTemplate, "opacity", "1", "0", "", {}, true);
+            this.destroyTileActionRenderer = new ct.core.render.HandlebarsSVGAnimationAttributeActionRenderer(tileClaimTemplate, "opacity", "1", "0", "-container", {}, true);
             this.createTileActionRenderer = new ct.core.render.board.HandlebarsSVGAnimationActionCreateTileRenderer(attributeAnimationTemplate, tileTemplate, tileColor, {});
             this.actionTimeRemainingUpdatedRenderer = new ct.core.render.board.action.ActionTimeRemainingUpdatedRenderer();
             this.actionUpdatePointsRenderer = new ct.core.render.board.action.ActionUpdatePointsRenderer();

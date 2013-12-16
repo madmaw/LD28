@@ -86,6 +86,7 @@
     <TypeScriptCompile Include="src\main\ts\core\render\IActionRendererFactory.ts" />
     <TypeScriptCompile Include="src\main\ts\core\render\IActionSource.ts" />
     <TypeScriptCompile Include="src\main\ts\core\render\IGameStateRenderer.ts" />
+    <TypeScriptCompile Include="src\main\ts\core\SoundEffect.ts" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="README.md" />

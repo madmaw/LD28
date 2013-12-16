@@ -27,6 +27,24 @@ module ct {
             console.log(s + x);
         };
 
+        var dropTileSoundEffect = new ct.core.SoundEffect(["click-1", "click-2", "click-3", "click-4"]);
+        var claimSoundEffect = new ct.core.SoundEffect(["whoosh-1", "whoosh-2", "whoosh-3"]);
+        var extolSoundEffects = [
+            new ct.core.SoundEffect([]),
+            new ct.core.SoundEffect([]),
+            new ct.core.SoundEffect(["extol-1", "", ""]),
+            new ct.core.SoundEffect(["extol-2", "", ""]),
+            new ct.core.SoundEffect(["extol-3", "", ""]),
+            new ct.core.SoundEffect(["extol-3", ""]),
+            new ct.core.SoundEffect(["extol-4", "", ""]),
+            new ct.core.SoundEffect(["extol-4", ""]),
+            new ct.core.SoundEffect(["extol-5", "", ""]),
+            new ct.core.SoundEffect(["extol-5", ""]),
+            new ct.core.SoundEffect(["extol-6", "", ""]),
+            new ct.core.SoundEffect(["extol-5", ""])
+        ];
+        var invalidSoundEffect = new ct.core.SoundEffect(["invalid-1", "invalid-2"]);
+
         var columns = 7;
         var tileWidth = Math.floor((window.innerWidth) / columns);
         var tileHeight = Math.floor((window.innerHeight)/Math.floor(window.innerHeight / tileWidth));
@@ -69,7 +87,8 @@ module ct {
                 [new ct.core.board.value.ValueFunctionIncrement(), new ct.core.board.value.ValueFunctionDecrement()],
                 [new ct.core.board.value.ValueFunctionMultiplication(), new ct.core.board.value.ValueFunctionAccumulate()],
             ],
-            2
+            2,
+            [new ct.core.board.value.ValueFunctionAccumulate()]
         );
         var timeTileSource = new ct.core.board.FairTileSource(
             0.25,
@@ -79,7 +98,8 @@ module ct {
                 [new ct.core.board.value.ValueFunctionIncrement(), new ct.core.board.value.ValueFunctionDecrement()],
                 [new ct.core.board.value.ValueFunctionMultiplication(), new ct.core.board.value.ValueFunctionAddTime()],
             ],
-            2
+            2, 
+            [new ct.core.board.value.ValueFunctionAddTime()]
             );
 
         var boardValueScorer = new ct.core.board.PointsSourceBoardValue();
@@ -181,6 +201,40 @@ module ct {
         levels.push(new ct.core.home.Level("timer", "Count Down", "first move starts timer", true, (level) => {
             var index = 0;
             var board = new ct.core.board.Board(columns, rows, tileWidth, tileHeight);
+            var tiles = scantRewardsTileSource.create(columns * rows, 1);
+            var tileId = 0;
+            var actions = [];
+            for (var x = board.tilesAcross; x > 0; ) {
+                x--;
+                for (var y = board.tilesDown; y > 0;) {
+                    y--;
+                    var tile = tiles[index];
+                    index++;
+                    // set the board for handlebars (ugh!) - actually no longer required (ugh)
+                    tile.board = board;
+                    var tileDropAction = new ct.core.board.action.ActionDropTile(tile, x, y - board.tilesDown, y);
+                    // drop them!
+                    actions.push(tileDropAction);
+                }
+            }
+            actions.push(new ct.core.board.action.ActionScoreUpdated());
+
+            var gameState: ct.core.IGameState = new ct.core.board.BoardGameState(
+                level,
+                board,
+                scantRewardsTileSource,
+                boardValueScorer,
+                60 * 1000 * 2
+                );
+            return {
+                gameState: gameState,
+                actions: actions
+            };
+        }));
+
+        levels.push(new ct.core.home.Level("tacc", "Timed Accumulater", "", true, (level) => {
+            var index = 0;
+            var board = new ct.core.board.Board(columns, rows, tileWidth, tileHeight);
             var tiles = accumulaterTileSource.create(columns * rows, 1);
             var tileId = 0;
             var actions = [];
@@ -251,21 +305,25 @@ module ct {
             },
             window.location.pathname,
             headerHeight, 
-            homeGameState
-            );
+            homeGameState, 
+            extolSoundEffects,
+            claimSoundEffect,
+            invalidSoundEffect
+        );
         var homeGameStateRenderer = new ct.core.render.home.HomeGameStateRenderer(
             toTemplate("home"),
             {},
             window.location.pathname,
             window.innerWidth,
             window.innerHeight
-            );
+        );
 
 
         var tileTemplate = toTemplate("tile");
         Handlebars.registerPartial("tile", tileTemplate);
         var actionDropTemplate = toTemplate("animate-action-drop");
         var attributeAnimationTemplate = toTemplate("animate-attribute");
+        var tileClaimTemplate = toTemplate("animate-grow");
         var actionSource: ct.core.render.IActionSource = null;
 
         var eatGameState = function (gameState: ct.core.IGameState, actions: ct.core.IAction[]) {
@@ -292,7 +350,9 @@ module ct {
                 "#888888",
                 tileTemplate,
                 attributeAnimationTemplate,
-                actionDropTemplate
+                tileClaimTemplate,
+                actionDropTemplate,
+                dropTileSoundEffect
                 );
             for (var i in actions) {
                 // note: we don't wait for the animations to finish before updating the game state

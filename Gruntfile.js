@@ -32,7 +32,8 @@
             dist: {
                 files: [
                     {expand: true, src: ['lib/*.min.js'], dest: 'dist/'},
-                    {expand: true, src: ['*.css'], dest: 'dist/'},
+                    {expand: true, src: ['res/**/*'], dest: 'dist/' },
+                    {expand: true, src: ['*.css'], dest: 'dist/' },
                     {expand: true, src: ['*.html'], dest: 'dist/'}
                 ]
             }

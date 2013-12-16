@@ -7,7 +7,15 @@ module ct.core.render.board {
         private mouseDown = false;
         private timerId: number;
 
-        constructor(private gameState: ct.core.board.BoardGameState, private homeGameState: ct.core.IGameState, private div: HTMLElement, private headerHeight: number) {
+        constructor(
+            private gameState: ct.core.board.BoardGameState,
+            private homeGameState: ct.core.IGameState,
+            private div: HTMLElement,
+            private headerHeight: number,
+            private extols: SoundEffect[], 
+            private claim: SoundEffect,
+            private invalid: SoundEffect
+        ) {
 
         }
 
@@ -338,10 +346,19 @@ module ct.core.render.board {
 
                 // finally calculate the new score
                 result.push(new ct.core.board.action.ActionScoreUpdated());
+                // TODO do not do this directly!
+                var extolIndex = Math.min(this.extols.length - 1, Math.max(0, tiles.length - 3));
+                var extol = this.extols[extolIndex];
+                setTimeout(function () {
+                    extol.play();
+                }, Math.random() * 500);
+                this.claim.play();
 
             } catch (e) {
                 // you failed!
                 // TODO have a failure action
+                // TODO do not do this directly!
+                this.invalid.play();
             }
             return result;
             

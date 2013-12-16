@@ -8,6 +8,7 @@ module ct.core.render.board {
             animationTemplate: (context: any, options?: any) => string,
             private tileTemplate: (context: any, options?: any) => string,
             private tileColor: string,
+            private soundEffect: SoundEffect,
             params: { [_: string]: any }
         ) {
             super(animationTemplate, params);
@@ -22,6 +23,11 @@ module ct.core.render.board {
             target.setAttribute("transform", "translate(" + x + "," + y + ")");
         }
 
+        public onCompletion(animated: boolean) {
+            // play a random sound
+            this.soundEffect.play();
+        }
+
         public findOrCreateTarget(action: ct.core.IAction, gameState: ct.core.IGameState, div: HTMLElement): Element {
             // attempt to find (it may exist)
             var boardGameState = <ct.core.board.BoardGameState>gameState;
@@ -32,9 +38,15 @@ module ct.core.render.board {
             var result: Element = document.getElementById(id);
             if (!result) {
                 var tileSVG = this.tileTemplate({ tile: tile, gameState: gameState, tileColor: this.tileColor });
-                result = this.parseSVG(tileSVG, id);
+                result = this.parseSVG(tileSVG, id)[0];
                 var boardTiles = document.getElementById(board.id + "-tiles");
-                boardTiles.appendChild(result);
+
+                var firstChild = boardTiles.firstChild;
+                if (firstChild) {
+                    boardTiles.insertBefore(result, firstChild);
+                } else {
+                    boardTiles.appendChild(result);
+                }
             }
             return result;
         }

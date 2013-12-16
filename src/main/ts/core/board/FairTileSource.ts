@@ -2,7 +2,7 @@ module ct.core.board {
 
     export class FairTileSource implements ITileSource {
 
-        constructor(private fairRatio: number, private normalValues: IValue[], private symbolValues: IValue[][], private cruelty: number) {
+        constructor(private fairRatio: number, private normalValues: IValue[], private symbolValues: IValue[][], private cruelty: number, private guaranteedSymbolValues?:IValue[]) {
 
         }
 
@@ -11,10 +11,10 @@ module ct.core.board {
                 rerand = 0;
             }
             var numberOfSymbols = Math.floor(quantity * this.fairRatio);
-            return this.createQuantity(quantity - numberOfSymbols, numberOfSymbols, rerand);
+            return this.createQuantity(quantity - numberOfSymbols, numberOfSymbols, rerand, false);
         }
 
-        createQuantity(numberOfValues: number, numberOfSymbols:number, rerand:number): Tile[] {
+        createQuantity(numberOfValues: number, numberOfSymbols:number, rerand:number, avoidForced?:boolean): Tile[] {
             var result:Tile[] = [];
             for (var i = 0; i < numberOfValues; i++) {
                 var r = Math.abs(this.rand(rerand) * 2 - 1);
@@ -22,6 +22,14 @@ module ct.core.board {
                 var value = this.normalValues[index];
                 var tile = new Tile(value);
                 result.push(tile);
+            }
+            if (this.guaranteedSymbolValues != null && !avoidForced) {
+                for (var j in this.guaranteedSymbolValues) {
+                    var value = this.guaranteedSymbolValues[j];
+                    var tile = new Tile(value);
+                    var pos = Math.floor(Math.random() * result.length);
+                    result.splice(pos, 0, tile);
+                }
             }
             for (var i = 0; i < numberOfSymbols; i++) {
                 var r = Math.abs(this.rand(rerand) * 2 - 1);
@@ -71,7 +79,7 @@ module ct.core.board {
             }
             
             
-            return this.createQuantity(Math.max(tiles.length - symbolCount, 0), symbolCount, Math.max(rerand, 0));
+            return this.createQuantity(Math.max(tiles.length - symbolCount, 0), symbolCount, Math.max(rerand, 0), true);
         }
 
         rand(rerand: number): number {

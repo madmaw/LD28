@@ -18,26 +18,40 @@ module ct.core.render {
                 this.params["animationId"] = animationId;
                 this.adjustParams(action, gameState, this.params);
                 var animationSVG = this.template(this.params);
-                var animationNode = this.parseSVG(animationSVG, animationId);
-                // clean up
-                animationNode.addEventListener('endEvent', () => {
-                    this.setToFinalState(action, gameState, target);
-                    target.removeChild(animationNode);
-                    if (onCompletionListener) {
-                        onCompletionListener(action, gameState);
-                    }
-                });
-                target.appendChild(animationNode);
-                // force it to start now (instead of at the start of the document, which was ages ago)
-                (<any>animationNode).beginElement();
+                var animationNodes = this.parseSVG(animationSVG);
+                var animationCompletionCount = 0;
+                for (var i in animationNodes) {
+                    var animationNode = animationNodes[i];
+                    console.log("animating "+animationNode.tagName);
+                    // clean up
+                    animationNode.addEventListener('endEvent', () => {
+                        this.setToFinalState(action, gameState, target);
+                        target.removeChild(animationNode);
+                        animationCompletionCount++;
+                        if (animationCompletionCount == animationNodes.length) {
+                            this.onCompletion(true);
+                            if (onCompletionListener) {
+                                onCompletionListener(action, gameState);
+                            }
+                        }
+                    });
+                    target.appendChild(animationNode);
+                    // force it to start now (instead of at the start of the document, which was ages ago)
+                    (<any>animationNode).beginElement();
+                }
                 
             } else {
                 this.setToFinalState(action, gameState, target);
+                this.onCompletion(false);
                 if (onCompletionListener) {
                     onCompletionListener(action, gameState);
                 }
             }
         }
+
+        public onCompletion(animated:boolean) {
+
+        } 
 
         public adjustParams(action: ct.core.IAction, gameState: ct.core.IGameState, params: { [_: string]: any }) {
 
@@ -51,12 +65,22 @@ module ct.core.render {
             return div;
         }
 
-        public parseSVG(s: string, targetId: string): Element {
+        public parseSVG(s: string, targetId?: string): Element[] {
             var div = <HTMLElement>document.createElementNS('http://www.w3.org/1999/xhtml', 'div');
             div.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg">' + s + '</svg>';
             // TOOD this without jQuery
-            return $(div).find("#" + targetId).get(0);
             //return div.document.getElementById(targetId);
+            var result = [];
+            for (var i in div.childNodes) {
+                var childNode = div.childNodes[i];
+                for (var j in childNode.childNodes) {
+                    var c = childNode.childNodes[j];
+                    if ((<any>c).tagName != null && (targetId == null || (<Element>c).getAttribute("id") == targetId)) {
+                        result.push(c);
+                    }
+                }
+            }
+            return result;
         }    
 
     }

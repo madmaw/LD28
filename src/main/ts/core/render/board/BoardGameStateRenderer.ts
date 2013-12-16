@@ -9,7 +9,10 @@ module ct.core.render.board {
             params: { [_: string]: any },
             baseUrl: string,
             private headerHeight: number, 
-            private homeGameState: ct.core.IGameState
+            private homeGameState: ct.core.IGameState,
+            private extols: SoundEffect[],
+            private claim: SoundEffect,
+            private invalid: SoundEffect
         ) {
             super(template, params, baseUrl);
         }
@@ -17,7 +20,7 @@ module ct.core.render.board {
         render(gameState: ct.core.IGameState, div: HTMLElement): IActionSource {
             super.render(gameState, div);
             // return our own handler
-            return new BoardGameStateActionSource(<ct.core.board.BoardGameState>gameState, this.homeGameState, div, this.headerHeight);
+            return new BoardGameStateActionSource(<ct.core.board.BoardGameState>gameState, this.homeGameState, div, this.headerHeight, this.extols, this.claim, this.invalid);
         }
 
 

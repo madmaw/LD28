@@ -21,7 +21,7 @@ module ct.core.render.board {
             var tile = actionCreate.tile;
             var id = tile.id;
             var tileSVG = this.tileTemplate({ tile: tile, gameState: gameState, tileColor: this.tileColor });
-            var result = this.parseSVG(tileSVG, id);
+            var result = this.parseSVG(tileSVG, id)[0];
             var boardTiles = document.getElementById(board.id + "-tiles");
             boardTiles.appendChild(result);
             return result;

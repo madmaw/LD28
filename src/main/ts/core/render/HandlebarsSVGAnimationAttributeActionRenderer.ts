@@ -26,8 +26,6 @@ module ct.core.render {
             var boardGameState = <ct.core.board.BoardGameState>gameState;
             var actionDrop = <ct.core.board.action.ActionDropTile>action;
             var board = boardGameState.board;
-            var x = actionDrop.column * board.tileWidth;
-            var y = actionDrop.toRow * board.tileHeight;
             target.setAttribute(this.attributeName, this.endValue);
             if (this.removeAllWhenDone) {
                 // remove the target from it's parent
