@@ -24,7 +24,8 @@
                 files: {
                     'dist/out.min.js': ['build/out.js'],
                     // compress handlebars
-                    'dist/lib/handlebars-v1.1.2.min.js': ['lib/handlebars-v1.1.2.js']
+                    'dist/lib/handlebars-v1.1.2.min.js': ['lib/handlebars-v1.1.2.js'],
+                    'dist/lib/analytics.min.js': ['lib/analytics.js']
                 }
             }
         },
