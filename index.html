@@ -11,13 +11,13 @@
         <svg width="{{windowWidth}}" height="{{windowHeight}}" viewBox="0 0 {{windowWidth}} {{windowHeight}}">
             <defs>
                 <pattern id="SquarePattern" patternUnits="userSpaceOnUse"
-                         x="0" y="0" width="{{tileWidth}}" height="{{tileHeight}}"
-                         viewBox="0 0 {{tileWidth}} {{tileHeight}}">
-                    <rect x="{{math tileWidth '*' '0.1'}}" y="{{math tileHeight '*' '0.1'}}" width="{{math tileWidth '*' '0.8'}}" height="{{math tileHeight '*' '0.8'}}" fill="#FEE8D6" />
+                         x="0" y="0" width="{{math tileWidth '*' '0.5'}}" height="{{math tileHeight '*' '0.5'}}"
+                         viewBox="0 0 {{math tileWidth '*' '0.5'}} {{math tileHeight '*' '0.5'}}">
+                    <rect x="{{math tileWidth '*' '0.1'}}" y="{{math tileHeight '*' '0.1'}}" width="{{math tileWidth '*' '0.4'}}" height="{{math tileHeight '*' '0.4'}}" fill="#333345" />
                 </pattern> 
             </defs>
             <g id="{{gameState.board.id}}" transform="translate(0, {{headerHeight}})">
-                <rect id="box" x="0" y="0" width="{{boardWidth}}" height="{{boardHeight}}" fill="#A78D84" />
+                <rect id="box" x="0" y="0" width="{{boardWidth}}" height="{{boardHeight}}" fill="#222233" />
                 <rect id="box" x="0" y="0" width="{{boardWidth}}" height="{{boardHeight}}" fill="url(#SquarePattern)"/>
                 <g id="{{gameState.board.id}}-tiles">
                     <!-- tiles go in here-->
@@ -53,8 +53,11 @@
 
     <script id="tile" type="text/x-handlebars-template">
         <g id="{{tile.id}}" transform="translate({{math gameState.board.tileWidth '*' tile.position.x}}, {{math gameState.board.tileHeight '*' tile.position.y}})">
-            <rect id="{{tile.id}}-bg" x="0" y="0" width="{{gameState.board.tileWidth}}" height="{{gameState.board.tileHeight}}" fill="{{tileColor}}" />
-            <text x="{{math gameState.board.tileWidth '/' 2}}" y="{{math gameState.board.tileHeight '/' 2}}" text-anchor="middle" alignment-baseline="central" font-size="{{math gameState.board.tileHeight '/' 2}}">{{tile.symbol}}</text>
+            <g id="{{tile.id}}-container">
+                <rect x="0" y="0" width="{{gameState.board.tileWidth}}" height="{{gameState.board.tileHeight}}" fill="#CCBBAA" />
+                <rect id="{{tile.id}}-bg" x="{{math gameState.board.tileWidth '*' '0.05'}}" y="{{math gameState.board.tileHeight '*' '0.05'}}" width="{{math gameState.board.tileWidth '*' '0.9'}}" height="{{math gameState.board.tileHeight '*' '0.9'}}" fill="{{tileColor}}" />
+                <text x="{{math gameState.board.tileWidth '/' 2}}" y="{{math gameState.board.tileHeight '/' 2}}" text-anchor="middle" alignment-baseline="central" font-size="{{math gameState.board.tileHeight '/' 2}}">{{tile.symbol}}</text>
+            </g>
         </g>
     </script>
 
@@ -66,7 +69,7 @@
                           type="translate"
                           from="{{math action.column '*' gameState.board.tileWidth}},{{math action.fromRow '*' gameState.board.tileHeight}}"
                           to="{{math action.column '*' gameState.board.tileWidth}},{{math action.toRow '*' gameState.board.tileHeight}}"
-                          dur="{{math action.dRow '*' '0.1'}}s"
+                          dur="{{math action.dRow '*' '0.15'}}s"
                           calcmode="spline"
                           keysplines="0.25 0 1 1"
                           keytimes="0;1"
@@ -82,17 +85,87 @@
                  attributename="{{attributeName}}"
                  from="{{from}}"
                  to="{{to}}"
-                 dur="0.15s"
+                 dur="0.2s"
                  additive="replace"
                  fill="freeze"
                  begin="indefinite" />
     </script>
 
+    <script id="animate-grow" type="text/x-handlebars-template">
+        <animate 
+                 attributetype="XML"
+                 attributename="opacity"
+                 from="1"
+                 to="0"
+                 dur="0.2s"
+                 additive="replace"
+                 fill="freeze"
+                 begin="indefinite" />
+        <animatetransform
+                          attributename="transform"
+                          attributetype="XML"
+                          type="scale"
+                          from="1,1"
+                          to="2,2"
+                          dur="0.2s"
+                          additive="replace"
+                          fill="freeze"
+                          begin="indefinite" />
+
+    </script>
 
     <script src="lib/jquery-2.0.3.min.js"></script>
     <script src="lib/handlebars-v1.1.2.min.js"></script>
     <script src="out.min.js"></script>
+
+
 </head>
-<body id="content">
+<body>
+    <div id="content"></div>
+    <audio id="click-1">
+        <source src="res/click-1.wav" type="audio/wav" preload="true"></source>
+    </audio>
+    <audio id="click-2">
+        <source src="res/click-2.wav" type="audio/wav" preload="true"></source>
+    </audio>
+    <audio id="click-3">
+        <source src="res/click-3.wav" type="audio/wav" preload="true"></source>
+    </audio>
+    <audio id="click-4">
+        <source src="res/click-4.wav" type="audio/wav" preload="true"></source>
+    </audio>
+    <audio id="invalid-1">
+        <source src="res/invalid-1.wav" type="audio/wav" preload="true"></source>
+    </audio>
+    <audio id="invalid-2">
+        <source src="res/invalid-2.wav" type="audio/wav" preload="true"></source>
+    </audio>
+    <audio id="whoosh-1">
+        <source src="res/whoosh-1.wav" type="audio/wav" preload="true"></source>
+    </audio>
+    <audio id="whoosh-2">
+        <source src="res/whoosh-2.wav" type="audio/wav" preload="true"></source>
+    </audio>
+    <audio id="whoosh-3">
+        <source src="res/whoosh-3.wav" type="audio/wav" preload="true"></source>
+    </audio>
+    <audio id="extol-1">
+        <source src="res/extol-1.wav" type="audio/wav" preload="true"></source>
+    </audio>
+    <audio id="extol-2">
+        <source src="res/extol-2.wav" type="audio/wav" preload="true"></source>
+    </audio>
+    <audio id="extol-3">
+        <source src="res/extol-3.wav" type="audio/wav" preload="true"></source>
+    </audio>
+    <audio id="extol-4">
+        <source src="res/extol-4.wav" type="audio/wav" preload="true"></source>
+    </audio>
+    <audio id="extol-5">
+        <source src="res/extol-5.wav" type="audio/wav" preload="true"></source>
+    </audio>
+    <audio id="extol-6">
+        <source src="res/extol-6.wav" type="audio/wav" preload="true"></source>
+    </audio>
 </body>
 </html>
