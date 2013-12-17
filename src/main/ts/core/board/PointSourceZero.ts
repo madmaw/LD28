@@ -1,8 +1,8 @@
 module ct.core.board {
 
-    export class PointsSourceBoardValue implements IPointsSource {
+    export class PointSourceZero implements IPointsSource {
 
-        name: string = "board value";
+        name: string = "zero";
 
         getPoints(gameState: BoardGameState): number {
             var result = 0;
@@ -16,7 +16,11 @@ module ct.core.board {
                     }
                 }
             }
-            return result;
+            return -Math.abs(result);
         }
+
+
+
     }
+
 } 

@@ -308,9 +308,12 @@ module ct.core.render.board {
                     }
                 }
 
-                var dropInTiles = boardGameState.tileSource.replace(boardGameState.board, tiles);
+                var dropInTiles: ct.core.board.Tile[];
                 var dropInTileIndex = 0;
-
+                if (boardGameState.replaceTiles) {
+                    dropInTiles = boardGameState.tileSource.replace(boardGameState.board, tiles);
+                }
+                 
                 // create valid sequence
                 // drop tiles above
                 for (var x = 0; x < this.gameState.board.tilesAcross; x++) {
@@ -346,12 +349,14 @@ module ct.core.render.board {
                             }
                         }
                     }
-                    // add in the equivalent number of removed elements
-                    for (var j = 0; j < removed; j++) {
-                        var tile = dropInTiles[dropInTileIndex];
-                        dropInTileIndex++;
-                        var action: IAction = new ct.core.board.action.ActionDropTile(tile, x, j - removed, j);
-                        result.push(action);
+                    if (boardGameState.replaceTiles) {
+                        // add in the equivalent number of removed elements
+                        for (var j = 0; j < removed; j++) {
+                            var tile = dropInTiles[dropInTileIndex];
+                            dropInTileIndex++;
+                            var action: IAction = new ct.core.board.action.ActionDropTile(tile, x, j - removed, j);
+                            result.push(action);
+                        }
                     }
                 }
 

@@ -5,11 +5,13 @@ module ct.core.board {
         public selectedTileChain: Tile[];
         public accumulatedPoints: number;
         public startTime: Date; 
+        public replaceTiles: boolean;
 
         constructor(public level: ct.core.home.Level, public board: Board, public tileSource: ITileSource, public pointsSource: IPointsSource, public gameplayMilliseconds?:number) {
             this.selectedTileChain = [];
             this.startTime = null;
             this.accumulatedPoints = 0;
+            this.replaceTiles = true;
         }
 
         public getId(): string {

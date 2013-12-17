@@ -27,7 +27,7 @@ module ct.core.render {
             var actionDrop = <ct.core.board.action.ActionDropTile>action;
             var board = boardGameState.board;
             target.setAttribute(this.attributeName, this.endValue);
-            if (this.removeAllWhenDone) {
+            if (this.removeAllWhenDone && target.parentNode) {
                 // remove the target from it's parent
                 target.parentNode.removeChild(target);
             }

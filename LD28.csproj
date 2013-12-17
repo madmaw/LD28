@@ -48,6 +48,7 @@
     <TypeScriptCompile Include="src\main\ts\core\board\PointSourceAccumulated.ts" />
     <TypeScriptCompile Include="src\main\ts\core\board\PointSourceMaxBoardValue.ts" />
     <TypeScriptCompile Include="src\main\ts\core\board\PointSourceTime.ts" />
+    <TypeScriptCompile Include="src\main\ts\core\board\PointSourceZero.ts" />
     <TypeScriptCompile Include="src\main\ts\core\board\PointsSourceBoardValue.ts" />
     <TypeScriptCompile Include="src\main\ts\core\board\TileSelectionState.ts" />
     <TypeScriptCompile Include="src\main\ts\core\board\value\AbstractValue.ts" />
@@ -55,6 +56,7 @@
     <TypeScriptCompile Include="src\main\ts\core\board\value\ValueFunctionAccumulate.ts" />
     <TypeScriptCompile Include="src\main\ts\core\board\value\ValueFunctionAddTime.ts" />
     <TypeScriptCompile Include="src\main\ts\core\board\value\ValueFunctionDecrement.ts" />
+    <TypeScriptCompile Include="src\main\ts\core\board\value\ValueFunctionDestroy.ts" />
     <TypeScriptCompile Include="src\main\ts\core\board\value\ValueFunctionIncrement.ts" />
     <TypeScriptCompile Include="src\main\ts\core\board\value\ValueFunctionMultiplication.ts" />
     <TypeScriptCompile Include="src\main\ts\core\board\value\ValueFunctionNegate.ts" />

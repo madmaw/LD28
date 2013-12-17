@@ -23,9 +23,11 @@ module ct {
                 "%": lvalue % rvalue
             }[operator];
         });
+        /*
         Handlebars.logger.log = function (s, x) {
             console.log(s + x);
         };
+*/
 
         var dropTileSoundEffect = new ct.core.SoundEffect(["click-1", "click-2", "click-3", "click-4"]);
         var claimSoundEffect = new ct.core.SoundEffect(["whoosh-1", "whoosh-2", "whoosh-3"]);
@@ -107,11 +109,22 @@ module ct {
             2, 
             [new ct.core.board.value.ValueFunctionAddTime()]
             );
+        var zeroTileSource = new ct.core.board.FairTileSource(
+            0.4,
+            [new ct.core.board.value.ValueNumeric(-1), new ct.core.board.value.ValueNumeric(1)],
+            [
+                [new ct.core.board.value.ValueFunctionAddition(), new ct.core.board.value.ValueFunctionSubtraction()],
+                [new ct.core.board.value.ValueFunctionIncrement(), new ct.core.board.value.ValueFunctionDecrement()],
+            ],
+            2,
+            [new ct.core.board.value.ValueFunctionMultiplication()]
+            );
 
         var boardValueScorer = new ct.core.board.PointsSourceBoardValue();
         var maxBoardValueScorer = new ct.core.board.PointsSourceMaxBoardValue();
         var accumulatedValueScorer = new ct.core.board.PointsSourceAccumulated();
         var timeScorer = new ct.core.board.PointSourceTime();
+        var zeroScorer = new ct.core.board.PointSourceZero();
 
         var levels = [];
         levels.push(new ct.core.home.Level("f2p", "You Only Get One(s)", "Back button exits", false, (level) => {
@@ -297,6 +310,37 @@ module ct {
                 );
             return {
                 gameState: gameState,
+                actions: actions
+            };
+        }));
+        levels.push(new ct.core.home.Level("zero", "Zero out", "make zero value", true, (level) => {
+            var index = 0;
+            var board = new ct.core.board.Board(columns, rows, tileWidth, tileHeight);
+            var tiles = zeroTileSource.create(columns * rows, 1);
+            var tileId = 0;
+            var actions = [];
+            for (var x = 0; x < board.tilesAcross; x++) {
+                for (var y = 0; y < board.tilesDown; y++) {
+                    var tile = tiles[index];
+                    index++;
+                    // set the board for handlebars (ugh!) - actually no longer required (ugh)
+                    tile.board = board;
+                    var tileDropAction = new ct.core.board.action.ActionDropTile(tile, x, y - board.tilesDown, y);
+                    // drop them!
+                    actions.push(tileDropAction);
+                }
+            }
+            actions.push(new ct.core.board.action.ActionScoreUpdated());
+
+            var gameState = new ct.core.board.BoardGameState(
+                level,
+                board,
+                zeroTileSource,
+                zeroScorer
+                );
+            gameState.replaceTiles = false;
+            return {
+                gameState: <ct.core.IGameState>gameState,
                 actions: actions
             };
         }));
