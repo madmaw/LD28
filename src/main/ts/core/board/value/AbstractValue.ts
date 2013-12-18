@@ -15,7 +15,7 @@ module ct.core.board.value {
 
         terminate(terminationTiles: Tile[], boardState: BoardGameState, value: number): IAction[]{
             // assume it's a replace action
-            var terminationTile = terminationTiles[0];
+            var terminationTile = terminationTiles[terminationTiles.length - 1];
             var createdTile = new Tile(new ValueNumeric(value)); 
             return [new ct.core.board.action.ActionCreateTile(createdTile, terminationTile.position.x, terminationTile.position.y)];
         }

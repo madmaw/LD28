@@ -394,9 +394,9 @@ module ct {
             // render and execute these actions
             var rendererFactory = new ct.core.render.HardcodedActionRendererFactory(
                 "#DDDDDD",
-                "#DDFFDD",
-                "#FFDDDD",
-                "#FFDDFF",
+                "#BBFFBB",
+                "#FFBBBB",
+                "#BBBBFF",
                 "#888888",
                 tileTemplate,
                 attributeAnimationTemplate,
