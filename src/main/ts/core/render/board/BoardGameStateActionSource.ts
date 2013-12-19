@@ -215,90 +215,135 @@ module ct.core.render.board {
 
         private calculateSelectionStates(values: ct.core.board.IValue[]): ct.core.board.TileSelectionState[]{
             var states = [];
-            var results = [];
-            this.calculateSelectionStates2(values, states, results);
-            // modify any extra values
-            if (results.length > 0) {
-                var count = results[0].quantity;
-                for (var j = 1; j < results.length; j++) {
-                    var r = results[j];
-                    for (var k = 0; k < r.quantity; k++) {
-                        var state = states[count + k];
-                        if (state == ct.core.board.TileSelectionState.VALID) {
-                            states[count + k] = ct.core.board.TileSelectionState.EXTRANEOUS;
-                        }
+            this.calculateSelectionStates2(values, states, false);
+            var brokenState = null;
+            for (var i in states) {
+                if (brokenState) {
+                    states[i] = brokenState;
+                } else {
+                    var state = states[i];
+                    if (state != ct.core.board.TileSelectionState.VALID) {
+                        brokenState = state;
                     }
-                    count += r.quantity;
                 }
             }
-            var extraState;
             for (var i in values) {
-                states.push(extraState = ct.core.board.TileSelectionState.BAD_PARAMETER);
+                states.push(ct.core.board.TileSelectionState.EXTRANEOUS);
             }
             return states;
         }
 
-        private calculateSelectionStates2(values: ct.core.board.IValue[], states: ct.core.board.TileSelectionState[], results?: { value: number; quantity: number; }[]): boolean {
-            var result;
+        private calculateSelectionStates2(values: ct.core.board.IValue[], states: ct.core.board.TileSelectionState[], resultExpected: boolean, leftParam?: number): number {
             if (values.length > 0) {
-                var head = values.splice(0, 1);
-                var value = head[0];
-                var numberOfParams = value.numberOfParams;
-                var state
-                var keepGoing;
-                if (numberOfParams > results.length) {
-                    state = ct.core.board.TileSelectionState.INVALID;
-                    keepGoing = false;
-                } else {
-                    var removed = results.splice(results.length - numberOfParams);
-                    var params = [];
-                    var quantity = 1;
-                    for (var i in removed) {
-                        var r = removed[i];
-                        quantity += r.quantity;
-                        params.push(r.value);
+                var head;
+                if (leftParam == null) {
+                    var leftState;
+                    head = values.splice(0, 1);
+                    var value = head[0];
+                    var numberOfParams = value.numberOfParams;
+                    if (numberOfParams == 0) {
+                        // do nothing, we're good
+                        leftParam = value.eval([]);
+                        leftState = ct.core.board.TileSelectionState.VALID;
+                        states.push(leftState);
+                    } else if (numberOfParams == 1) {
+                        // put it back!
+                        values.splice(0, 0, value);
+
+                        leftParam = null;
+                    } else {
+                        // just exit
+                        return null;
                     }
-                    var valueResult = value.eval(params);
-
-                    results.push({ value: valueResult, quantity: quantity });
-                    state = ct.core.board.TileSelectionState.VALID;
-                    keepGoing = value.evalReturnsNumber;
                 }
-                states.push(state);
-                if (keepGoing) {
-                    // keep going
-                    result = this.calculateSelectionStates2(values, states, results);
+                var result;
+                if (values.length > 0) {
+                    head = values.splice(0, 1);
+                    var index = states.length;
+                    var operator: ct.core.board.IValue = head[0];
+                    var operatorState;
+                    if (operator.evalReturnsNumber || !resultExpected) {
+                        numberOfParams = operator.numberOfParams;
+                        if (numberOfParams == 2) {
+                            var rightParam = this.calculateSelectionStates2(values, states, true);
+                            if (rightParam != null) {
+                                operatorState = ct.core.board.TileSelectionState.VALID;
+                                result = operator.eval([leftParam, rightParam]);
+                            } else {
+                                operatorState = ct.core.board.TileSelectionState.INVALID;
+                                result = null;
+                            }
+                        } else if (numberOfParams == 1) {
+                            // do on the spot
+                            var rightParam = this.calculateSelectionStates2(values, states, true);
+                            if (rightParam == null) {
+                                operatorState = ct.core.board.TileSelectionState.INVALID;
+                            } else {
+                                operatorState = ct.core.board.TileSelectionState.VALID;
+                            }
+                            result = operator.eval([0]);
+                        } else {
+                            operatorState = ct.core.board.TileSelectionState.EXTRANEOUS;
+                            result = 0;
+                        }
+                    } else {
+                        operatorState = ct.core.board.TileSelectionState.BAD_PARAMETER;
+                    }
+                    states.splice(index, 0, operatorState);
+                } else if (leftParam != null) {
+                    result = leftParam;
                 } else {
-                    result = true;
+                    result = null;
                 }
-
+                return result;
             } else {
-                result = false;
+                return leftParam;
             }
-            return result;
         }
 
-        private eval(values: ct.core.board.IValue[], results?: number[]): number {
-            if (results == null) {
-                results = [];
-            }
+        private eval(values: ct.core.board.IValue[], rightParam?: number): number {
             if (values.length > 0) {
-                var head = values.splice(0, 1);
-                var value = head[0];
-                var numberOfParams = value.numberOfParams;
-                if (numberOfParams > results.length) {
-                    throw "not enough params";
+                var tail;
+                if (rightParam == null) {
+                    tail = values.splice(values.length - 1, 1);
+                    var value = tail[0];
+                    var numberOfParams = value.numberOfParams;
+                    if (numberOfParams == 0) {
+                        // do nothing, we're good
+                        rightParam = value.eval([]);
+                    } else {
+                        throw "expected number";
+                    }
                 }
-                var params = results.splice(results.length - numberOfParams);
-                var result = value.eval(params);
-                results.push(result);
-                return this.eval(values, results);
-            } else {
-                if (results.length == 1) {
-                    return results[0];
+                var result;
+                if (values.length > 0) {
+                    tail = values.splice(values.length - 1, 1);
+                    var operator: ct.core.board.IValue = tail[0];
+                    numberOfParams = operator.numberOfParams;
+                    if (rightParam == null) {
+                        throw "missing right param"
+                    }
+                    if (numberOfParams == 2) {
+                        var leftParam = this.eval(values);
+                        if (leftParam == null) {
+                            throw "missing left param";
+                        }
+                        result = operator.eval([leftParam, rightParam]);
+                    } else if (numberOfParams == 1) {
+                        // do on the spot
+                        var local = operator.eval([rightParam]);
+                        result = this.eval(values, local);
+                    } else {
+                        throw "unexpected number of params " + numberOfParams;
+                    }
+                } else if (rightParam != null) {
+                    result = rightParam;
                 } else {
-                    throw "too many results"
+                    throw "no value";
                 }
+                return result;
+            } else {
+                return rightParam;
             }
         }
 
@@ -333,7 +378,7 @@ module ct.core.render.board {
                     // add in a tile with the constant value
                     //newTile = new ct.core.board.Tile(new ct.core.board.value.ValueNumeric(value));
                     //var action: IAction = new ct.core.board.action.ActionCreateTile(newTile, tiles[0].position.x, tiles[0].position.y);
-                    var valueActions = tiles[tiles.length - 1].value.terminate(tiles, this.gameState, value);
+                    var valueActions = tiles[0].value.terminate(tiles, this.gameState, value);
                     for (var i in valueActions) {
                         var action = valueActions[i];
                         if (action instanceof ct.core.board.action.ActionCreateTile) {

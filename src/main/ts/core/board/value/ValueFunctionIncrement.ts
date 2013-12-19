@@ -2,7 +2,7 @@ module ct.core.board.value {
     export class ValueFunctionIncrement extends AbstractValue {
 
         constructor() {
-            super(true, 1, '++');
+            super(true, 1, 'inc');
         }
 
         eval(params: number[]): number {
