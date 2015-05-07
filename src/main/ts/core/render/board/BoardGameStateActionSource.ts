@@ -7,7 +7,7 @@ module ct.core.render.board {
         private mouseDown = false;
         private timerId: number;
 
-        private touchStartListener: (e:any) => void;
+        private touchStartListener: (e: any) => void;
         private touchMoveListener: (e: any) => void;
         private touchEndListener: (e: any) => void;
 
@@ -16,14 +16,14 @@ module ct.core.render.board {
             private homeGameState: ct.core.IGameState,
             private div: HTMLElement,
             private headerHeight: number,
-            private extols: SoundEffect[], 
+            private extols: SoundEffect[],
             private claim: SoundEffect,
             private invalid: SoundEffect
-        ) {
+            ) {
 
         }
 
-        countDown(startTime?:Date) {
+        countDown(startTime?: Date) {
             // timeout at the next interval
             var timeRemaining = this.gameState.millisecondsRemaining;
             if (timeRemaining != null) {
@@ -36,13 +36,13 @@ module ct.core.render.board {
                 }
                 this.actionHandler(
                     [
-                        new ct.core.board.action.ActionTimeRemainingUpdated(this.gameState.secondsRemainingFormatted, this.gameState, null, startTime, timeoutGameState), 
+                        new ct.core.board.action.ActionTimeRemainingUpdated(this.gameState.secondsRemainingFormatted, this.gameState, null, startTime, timeoutGameState),
                         // do it because certain kinds of scorers need it
                         new ct.core.board.action.ActionScoreUpdated()
                     ]
-                );
+                    );
                 // attempt to sync that up with a 0
-                this.timerId = setTimeout(() => { this.countDown() }, (timeRemaining % 100)+1);
+                this.timerId = setTimeout(() => { this.countDown() }, (timeRemaining % 100) + 1);
             }
         }
 
@@ -174,9 +174,9 @@ module ct.core.render.board {
                 e.preventDefault();
             };
 
-            this.div.addEventListener('touchstart', this.touchStartListener); 
-            this.div.addEventListener('touchmove', this.touchMoveListener); 
-            this.div.addEventListener('touchend', this.touchEndListener); 
+            this.div.addEventListener('touchstart', this.touchStartListener);
+            this.div.addEventListener('touchmove', this.touchMoveListener);
+            this.div.addEventListener('touchend', this.touchEndListener);
         }
 
         stop(): void {
@@ -213,141 +213,60 @@ module ct.core.render.board {
 
         }
 
-        private calculateSelectionStates(values: ct.core.board.IValue[]): ct.core.board.TileSelectionState[]{
-            var states = [];
-            this.calculateSelectionStates2(values, states, false);
-            var brokenState = null;
-            for (var i in states) {
-                if (brokenState) {
-                    states[i] = brokenState;
-                } else {
-                    var state = states[i];
-                    if (state != ct.core.board.TileSelectionState.VALID) {
-                        brokenState = state;
-                    }
-                }
-            }
+        private calculateSelectionStates(values: ct.core.board.IValue[]): ct.core.board.TileSelectionState[] {
+            var result = [];
+            this.calculateSelectionStates2(values, result, false);
             for (var i in values) {
-                states.push(ct.core.board.TileSelectionState.EXTRANEOUS);
+                result.push(ct.core.board.TileSelectionState.EXTRANEOUS);
             }
-            return states;
+            return result;
         }
 
-        private calculateSelectionStates2(values: ct.core.board.IValue[], states: ct.core.board.TileSelectionState[], resultExpected: boolean, leftParam?: number): number {
+        private calculateSelectionStates2(values: ct.core.board.IValue[], states: ct.core.board.TileSelectionState[], isParameter: boolean): boolean {
+            var result;
             if (values.length > 0) {
-                var head;
-                if (leftParam == null) {
-                    var leftState;
-                    head = values.splice(0, 1);
-                    var value = head[0];
-                    var numberOfParams = value.numberOfParams;
-                    if (numberOfParams == 0) {
-                        // do nothing, we're good
-                        leftParam = value.eval([]);
-                        leftState = ct.core.board.TileSelectionState.VALID;
-                        states.push(leftState);
-                    } else if (numberOfParams == 1) {
-                        // put it back!
-                        values.splice(0, 0, value);
-
-                        leftParam = null;
-                    } else {
-                        // just exit
-                        return null;
-                    }
+                var head = values.splice(0, 1);
+                var value = head[0];
+                var numberOfParams = value.numberOfParams;
+                result = true;
+                var stateIndex = states.length;
+                for (var i = 0; i < numberOfParams; i++) {
+                    result = this.calculateSelectionStates2(values, states, true) && result;
                 }
-                var result;
-                if (values.length > 0) {
-                    head = values.splice(0, 1);
-                    var index = states.length;
-                    var operator: ct.core.board.IValue = head[0];
-                    var operatorState;
-                    if (operator.evalReturnsNumber || !resultExpected) {
-                        numberOfParams = operator.numberOfParams;
-                        if (numberOfParams == 2) {
-                            var rightParam = this.calculateSelectionStates2(values, states, true);
-                            if (rightParam != null) {
-                                operatorState = ct.core.board.TileSelectionState.VALID;
-                                result = operator.eval([leftParam, rightParam]);
-                            } else {
-                                operatorState = ct.core.board.TileSelectionState.INVALID;
-                                result = null;
-                            }
-                        } else if (numberOfParams == 1) {
-                            // do on the spot
-                            var rightParam = this.calculateSelectionStates2(values, states, true);
-                            if (rightParam == null) {
-                                operatorState = ct.core.board.TileSelectionState.INVALID;
-                            } else {
-                                operatorState = ct.core.board.TileSelectionState.VALID;
-                            }
-                            result = operator.eval([0]);
-                        } else {
-                            operatorState = ct.core.board.TileSelectionState.EXTRANEOUS;
-                            result = 0;
-                        }
-                    } else {
-                        operatorState = ct.core.board.TileSelectionState.BAD_PARAMETER;
-                    }
-                    states.splice(index, 0, operatorState);
-                } else if (leftParam != null) {
-                    result = leftParam;
+                var state
+                if (isParameter && !value.evalReturnsNumber) {
+                    state = ct.core.board.TileSelectionState.BAD_PARAMETER;
+                    result = false;
+                } else if (result) {
+                    state = ct.core.board.TileSelectionState.VALID;
                 } else {
-                    result = null;
+                    state = ct.core.board.TileSelectionState.INVALID;
                 }
-                return result;
+                states.splice(stateIndex, 0, state);
             } else {
-                return leftParam;
+                result = false;
             }
+            return result;
         }
 
-        private eval(values: ct.core.board.IValue[], rightParam?: number): number {
+        private eval(values: ct.core.board.IValue[]): number {
             if (values.length > 0) {
-                var tail;
-                if (rightParam == null) {
-                    tail = values.splice(values.length - 1, 1);
-                    var value = tail[0];
-                    var numberOfParams = value.numberOfParams;
-                    if (numberOfParams == 0) {
-                        // do nothing, we're good
-                        rightParam = value.eval([]);
-                    } else {
-                        throw "expected number";
-                    }
+                var head = values.splice(0, 1);
+                var value = head[0];
+                var numberOfParams = value.numberOfParams;
+                var params = [];
+                for (var i = 0; i < numberOfParams; i++) {
+                    var param = this.eval(values);
+                    // will remove the head
+                    params.push(param);
                 }
-                var result;
-                if (values.length > 0) {
-                    tail = values.splice(values.length - 1, 1);
-                    var operator: ct.core.board.IValue = tail[0];
-                    numberOfParams = operator.numberOfParams;
-                    if (rightParam == null) {
-                        throw "missing right param"
-                    }
-                    if (numberOfParams == 2) {
-                        var leftParam = this.eval(values);
-                        if (leftParam == null) {
-                            throw "missing left param";
-                        }
-                        result = operator.eval([leftParam, rightParam]);
-                    } else if (numberOfParams == 1) {
-                        // do on the spot
-                        var local = operator.eval([rightParam]);
-                        result = this.eval(values, local);
-                    } else {
-                        throw "unexpected number of params " + numberOfParams;
-                    }
-                } else if (rightParam != null) {
-                    result = rightParam;
-                } else {
-                    throw "no value";
-                }
-                return result;
+                return value.eval(params);
             } else {
-                return rightParam;
+                throw "too short!";
             }
         }
 
-        private toValues(tiles: ct.core.board.Tile[]): ct.core.board.IValue[]{
+        private toValues(tiles: ct.core.board.Tile[]): ct.core.board.IValue[] {
             var values = [];
             for (var i in tiles) {
                 var tile = tiles[i];
@@ -356,7 +275,7 @@ module ct.core.render.board {
             return values;
         }
 
-        private actionTiles(boardGameState:ct.core.board.BoardGameState, tiles: ct.core.board.Tile[]): IAction[]{
+        private actionTiles(boardGameState: ct.core.board.BoardGameState, tiles: ct.core.board.Tile[]): IAction[] {
 
             var result = [];
             try {
@@ -394,7 +313,7 @@ module ct.core.render.board {
                 if (boardGameState.replaceTiles) {
                     dropInTiles = boardGameState.tileSource.replace(boardGameState.board, tiles);
                 }
-                 
+
                 // create valid sequence
                 // drop tiles above
                 for (var x = 0; x < this.gameState.board.tilesAcross; x++) {
@@ -458,7 +377,7 @@ module ct.core.render.board {
                 this.invalid.play();
             }
             return result;
-            
+
         }
     }
 

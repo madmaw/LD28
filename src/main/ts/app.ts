@@ -385,6 +385,8 @@ module ct {
                 stateRenderer = homeGameStateRenderer;
             }
             var el = document.getElementById('content');
+            el.setAttribute("width", ""+window.innerWidth+"px");
+            el.setAttribute("height", ""+window.innerHeight+"px");
             if (actionSource != null) {
                 // close it down
                 actionSource.stop();
