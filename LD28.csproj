@@ -27,6 +27,7 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
+    <TypeScriptCompile Include="references.ts" />
     <TypeScriptCompile Include="src\main\d.ts\handlebars.d.ts" />
     <TypeScriptCompile Include="src\main\d.ts\jquery.d.ts" />
     <TypeScriptCompile Include="src\main\ts\app.ts" />

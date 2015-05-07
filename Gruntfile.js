@@ -3,10 +3,11 @@
     // Project configuration.
     grunt.initConfig({
         pkg: grunt.file.readJSON('package.json'),
-        typescript: {
+        ts: {
             build: {
                 src: ['src/main/ts/**/*.ts', 'src/main/d.ts/**/*.d.ts'],
-                dest: 'build/out.js',
+                out: 'build/out.js',
+                reference: 'references.ts',
                 options: {
                     module: 'amd', //or commonjs
                     target: 'es5', //or es3
@@ -22,7 +23,7 @@
         uglify: {
             dist: {
                 files: {
-                    'dist/out.min.js': ['build/out.js'],
+                    //'dist/out.min.js': ['build/out.js'],
                     // compress handlebars
                     'dist/lib/handlebars-v1.1.2.min.js': ['lib/handlebars-v1.1.2.js'],
                     'dist/lib/analytics.min.js': ['lib/analytics.js']
@@ -32,6 +33,7 @@
         copy: {
             dist: {
                 files: [
+                    {dest:'dist/out.min.js', src:'build/out.js'},
                     {expand: true, src: ['lib/*.min.js'], dest: 'dist/'},
                     {expand: true, src: ['res/**/*'], dest: 'dist/' },
                     {expand: true, src: ['*.css'], dest: 'dist/' },
@@ -77,7 +79,7 @@
     // Load the plugin that provides the "uglify" task.
     grunt.loadNpmTasks('grunt-contrib-uglify');
     // Load the plugin that provides the "TS" task.
-    grunt.loadNpmTasks('grunt-typescript');
+    grunt.loadNpmTasks('grunt-ts');
     // zip
     grunt.loadNpmTasks('grunt-zip');
     // copy
@@ -87,7 +89,7 @@
 
     // Default task(s).
     grunt.registerTask('reset', ['clean']);
-    grunt.registerTask('dist', ['typescript', 'uglify', 'copy', 'replace', 'zip']);
-    grunt.registerTask('default', ['typescript']);
+    grunt.registerTask('dist', ['ts', 'uglify', 'copy', 'replace', 'zip']);
+    grunt.registerTask('default', ['ts']);
 
 };
